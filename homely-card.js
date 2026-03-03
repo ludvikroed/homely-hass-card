@@ -10,12 +10,19 @@ class HomelyCard extends HTMLElement {
       motion_sensors: this._toArray(config.motion_sensors),
       door_sensors: this._toArray(config.door_sensors),
       battery_sensor: this._toArray(config.battery_sensor),
+      left_lock_door: this._singleEntity(config.left_lock_door),
+      left_lock_motion: this._singleEntity(config.left_lock_motion),
     };
   }
 
   _toArray(value) {
     if (!value) return [];
     return Array.isArray(value) ? value : [value];
+  }
+
+  _singleEntity(value) {
+    if (!value) return null;
+    return Array.isArray(value) ? value[0] || null : value;
   }
 
   _escapeHtml(str) {
@@ -170,6 +177,40 @@ class HomelyCard extends HTMLElement {
     `;
   }
 
+  _getLockVisual(stateRaw) {
+    const state = String(stateRaw ?? "").toLowerCase().trim();
+
+    if (state === "locked") return { icon: "mdi:lock", color: "#2ecc40" };
+    if (state === "unlocked") return { icon: "mdi:lock-open-variant", color: "#ff4136" };
+    if (state === "locking") return { icon: "mdi:lock-outline", color: "#ff851b" };
+    if (state === "unlocking") return { icon: "mdi:lock-open-outline", color: "#ff851b" };
+    if (state === "jammed") return { icon: "mdi:lock-alert", color: "#ff4136" };
+    if (state === "unavailable") return { icon: "mdi:lock-off", color: "#ff4136" };
+
+    return { icon: "mdi:lock-question", color: "#ff851b" };
+  }
+
+  _renderLeftLockHtml(hass, entityId) {
+    if (!entityId) return "";
+
+    const entity = hass.states[entityId];
+    if (!entity) return "";
+
+    const state = String(entity.state || "");
+    const name = entity.attributes?.friendly_name || entityId;
+    const v = this._getLockVisual(state);
+
+    return `
+      <button
+        class="homely-icon-btn"
+        data-entity="${this._escapeHtml(entityId)}"
+        title="${this._escapeHtml(name)}: ${this._escapeHtml(state)}"
+      >
+        <ha-icon icon="${v.icon}" style="color:${v.color}; --mdc-icon-size:24px;"></ha-icon>
+      </button>
+    `;
+  }
+
   _renderMotionHtml(hass) {
     let html = "";
     this.config.motion_sensors.forEach((entityId) => {
@@ -268,9 +309,11 @@ class HomelyCard extends HTMLElement {
   set hass(hass) {
     const { alarmIcon, color, alarmStatusText } = this._getAlarmInfo(hass);
     const motionHtml = this._renderMotionHtml(hass);
+    const motionLockHtml = this._renderLeftLockHtml(hass, this.config.left_lock_motion);
     const batteryHtml = this._renderBatteryHtml(hass);
     const wsHtml = this._renderWebsocketHtml(hass);
     const doorHtml = this._renderDoorHtml(hass);
+    const doorLockHtml = this._renderLeftLockHtml(hass, this.config.left_lock_door);
     const tempsHtml = this._renderTempsHtml(hass);
 
     this.innerHTML = `
@@ -359,8 +402,8 @@ class HomelyCard extends HTMLElement {
           </div>
 
           <div class="homely-right">
-            <div class="homely-row">${motionHtml}${batteryHtml}${wsHtml}</div>
-            <div class="homely-row">${doorHtml}</div>
+            <div class="homely-row">${motionLockHtml}${motionHtml}${batteryHtml}${wsHtml}</div>
+            <div class="homely-row">${doorLockHtml}${doorHtml}</div>
           </div>
 
           ${tempsHtml}
