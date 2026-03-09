@@ -1,16 +1,23 @@
-Laget av GPT-codex
+Made by GPT-codex
+
+This project was created primarily for my own Home Assistant setup. It hasn’t been widely tested outside my environment, so things may not work perfectly for everyone. If you find it useful, feel free to use it.
 
 ![IMG_0030](https://github.com/user-attachments/assets/369821ab-19a1-481a-8b8c-8c3d63b54df2)
-min config:
 
+## My configuration
+
+```yaml
 type: custom:homely-card
+
 alarm_entity: alarm_control_panel.jf23_alarm
+
 lock_entities:
   - lock.las_hovedetasje
   - lock.las_treningsrom
 
 battery_sensor: binary_sensor.status_of_batteries_2
 websocket_entity: sensor.jf23_websocket_status
+
 temperature_entities:
   - entity: sensor.utetemperatur_utetempratur
     name: Ute
@@ -29,7 +36,7 @@ temperature_entities:
     icon: mdi:bed
     color: "#FFA500"
   - entity: sensor.royk_foreldre_temperature_2
-    name: Ingrid&OJ
+    name: Ingrid & OJ
     icon: mdi:bed
     color: "#4CAF50"
   - entity: sensor.royk_nora_temperature_2
@@ -48,11 +55,14 @@ temperature_entities:
     name: Hybel
     icon: mdi:cash-100
     color: "#8E44AD"
+
 door_sensors:
   - binary_sensor.dor_hovedetasje_alarm
   - binary_sensor.dor_treningsrom_alarm
   - binary_sensor.dor_vaskerom_alarm
   - binary_sensor.dor_veranda_alarm
+
 motion_sensors:
   - binary_sensor.bevegelse_stue_alarm
   - binary_sensor.bevegelse_treningsrom_alarm
+```
