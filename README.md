@@ -4,6 +4,7 @@ This project was created primarily for my own Home Assistant setup. It hasn’t 
 
 ![IMG_0030](https://github.com/user-attachments/assets/369821ab-19a1-481a-8b8c-8c3d63b54df2)
 
+Dark mode is required for the card to show correctly
 ## My configuration
 
 ```yaml
